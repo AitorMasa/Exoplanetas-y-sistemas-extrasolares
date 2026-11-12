@@ -1,0 +1,3 @@
+La letra indica principalmente temperatura y color: O, B, A, F, G, K, M, de más caliente a más fría. El número afina el tipo, y el número romano indica luminosidad: V es una estrella normal de secuencia principal, III una gigante y I una supergigante.
+
+Las enanas marrones suelen aparecer con tipos espectrales tardíos M, L, T o Y, pero ser enana marrón se determina realmente por su masa, no solo por st_spectype.

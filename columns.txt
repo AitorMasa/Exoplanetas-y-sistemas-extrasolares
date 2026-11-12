@@ -1,0 +1,97 @@
+Referencia de columnas de CLEAN/dataset_merged.csv
+Fuente: leyenda de RAW/PS_2026.11.09_07.13.26.csv
+
+Las terminaciones _x y _y aparecen porque pandas encontró columnas con el
+mismo nombre al hacer merge. Representan la misma variable, procedente de
+los dos DataFrames fusionados; hay que compararlas antes de elegir una o
+eliminar una de ellas.
+
+Unnamed: 0       Índice guardado accidentalmente al exportar un CSV.
+measurement_id   Identificador de la fila/medición creado en el proyecto.
+pl_name          Nombre del planeta.
+hostname_x        Nombre de la estrella anfitriona; procedente del primer DataFrame.
+default_flag     1 = conjunto de parámetros predeterminado; 0 = otro conjunto.
+pl_orbper_x      Período orbital [días]; procedente del primer DataFrame.
+pl_rade_x        Radio planetario [radios terrestres]; procedente del primer DataFrame.
+pl_orbeccen_x    Excentricidad orbital; procedente del primer DataFrame.
+pl_eqt_x         Temperatura de equilibrio del planeta [K]; procedente del primer DataFrame.
+st_teff_x        Temperatura efectiva estelar [K]; procedente del primer DataFrame.
+st_mass_x        Masa estelar [masas solares]; procedente del primer DataFrame.
+pl_pubdate_x     Fecha de publicación de la referencia de parámetros planetarios; primer DataFrame.
+releasedate_x    Fecha de publicación de los datos; primer DataFrame.
+hostname_y        Nombre de la estrella anfitriona; procedente del segundo DataFrame.
+pl_orbper_y      Período orbital [días]; procedente del segundo DataFrame.
+pl_rade_y        Radio planetario [radios terrestres]; procedente del segundo DataFrame.
+pl_radj          Radio planetario [radios de Júpiter].
+pl_bmasse        Masa planetaria o masa × sen(i) [masas terrestres].
+pl_orbeccen_y    Excentricidad orbital; procedente del segundo DataFrame.
+pl_insol         Flujo de insolación [flujo recibido por la Tierra].
+pl_eqt_y         Temperatura de equilibrio del planeta [K]; procedente del segundo DataFrame.
+ttv_flag         Indica variaciones en el tiempo de tránsito.
+pl_controv_flag  Indica si el planeta es controvertido.
+hostname          Nombre de la estrella anfitriona; procedente de la tabla de descubrimientos.
+discoverymethod  Método de descubrimiento.
+disc_year        Año de descubrimiento.
+disc_facility    Instalación u observatorio del descubrimiento.
+soltype          Tipo de solución (por ejemplo, Published Confirmed).
+pl_pubdate_y     Fecha de publicación de la referencia de parámetros planetarios; segundo DataFrame.
+releasedate_y    Fecha de publicación de los datos; segundo DataFrame.
+st_spectype      Tipo espectral de la estrella.
+st_teff_y        Temperatura efectiva estelar [K]; procedente del segundo DataFrame.
+st_rad           Radio estelar [radios solares].
+st_mass_y        Masa estelar [masas solares]; procedente del segundo DataFrame.
+st_met           Metalicidad estelar [dex].
+st_metratio      Escala de la metalicidad, por ejemplo [Fe/H] o [M/H].
+st_logg          Gravedad superficial estelar [log10(cm/s²)].
+sy_snum          Número de estrellas gravitacionalmente ligadas en el sistema.
+sy_pnum          Número de planetas confirmados en el sistema.
+ra               Ascensión recta [grados].
+dec              Declinación [grados].
+sy_dist          Distancia al sistema [parsecs].
+
+
+
+ #   Column           Non-Null Count  Dtype  
+---  ------           --------------  -----  
+ 0   Unnamed: 0       6464 non-null   int64  
+ 1   measurement_id   6464 non-null   object 
+ 2   pl_name          6464 non-null   object 
+ 3   hostname_x       6464 non-null   object 
+ 4   default_flag     6464 non-null   int64  
+ 5   pl_orbper_x      6096 non-null   float64
+ 6   pl_rade_x        4838 non-null   float64
+ 7   pl_orbeccen_x    2788 non-null   float64
+ 8   pl_eqt_x         1786 non-null   float64
+ 9   st_teff_x        5686 non-null   float64
+ 10  st_mass_x        5583 non-null   float64
+ 11  pl_pubdate_x     6464 non-null   object 
+ 12  releasedate_x    6464 non-null   object 
+ 13  hostname_y       6464 non-null   object 
+ 14  pl_orbper_y      6088 non-null   float64
+ 15  pl_rade_y        4838 non-null   float64
+ 16  pl_radj          4838 non-null   float64
+ 17  pl_bmasse        3203 non-null   float64
+ 18  pl_orbeccen_y    2788 non-null   float64
+ 19  pl_insol         958 non-null    float64
+ 20  pl_eqt_y         1786 non-null   float64
+ 21  ttv_flag         6464 non-null   int64  
+ 22  pl_controv_flag  6464 non-null   int64  
+ 23  hostname         6464 non-null   object 
+ 24  discoverymethod  6464 non-null   object 
+ 25  disc_year        6464 non-null   int64  
+ 26  disc_facility    6459 non-null   object 
+ 27  soltype          6464 non-null   object 
+ 28  pl_pubdate_y     6464 non-null   object 
+ 29  releasedate_y    6464 non-null   object 
+ 30  st_spectype      1434 non-null   object 
+ 31  st_teff_y        5686 non-null   float64
+ 32  st_rad           5630 non-null   float64
+ 33  st_mass_y        5558 non-null   float64
+ 34  st_met           4421 non-null   float64
+ 35  st_metratio      4410 non-null   object 
+ 36  st_logg          5323 non-null   float64
+ 37  sy_snum          6464 non-null   int64  
+ 38  sy_pnum          6464 non-null   int64  
+ 39  ra               6464 non-null   float64
+ 40  dec              6464 non-null   float64
+ 41  sy_dist          6329 non-null   float64
