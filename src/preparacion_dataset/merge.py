@@ -23,6 +23,14 @@ print(m.shape)
 print(p.shape)
 print(s.shape)
 
+print(d["disc_year"].sort_values(ascending=False))
+
+mask_year = (d["disc_year"] == 3025) | (d["disc_year"] == 1700)
+d.loc[mask_year, "disc_year"] = pd.NA
+print(d.head())
+print(d["disc_year"].sort_values(ascending=False))
+
+
 print(m.head())
 mask_flag = m["default_flag"] == 1
 m2 = m.loc[mask_flag]

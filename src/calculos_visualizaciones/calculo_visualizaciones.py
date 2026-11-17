@@ -130,24 +130,19 @@ plt.show()
 
 # 6. Temperatura y luminosidad según el tipo espectral
 
-estrellas_grafico = sistemas.dropna(
-    subset=["st_teff_y", "st_rad"]
-).copy()
+estrellas_grafico = sistemas.dropna(subset=["st_teff_y", "st_rad"]).copy()
 
 estrellas_grafico = estrellas_grafico[
     (estrellas_grafico["st_teff_y"] > 0)
-    & (estrellas_grafico["st_rad"] > 0)
-]
+    & (estrellas_grafico["st_rad"] > 0)]
 
 estrellas_grafico["luminosidad_relativa"] = (
     estrellas_grafico["st_rad"] ** 2
-    * (estrellas_grafico["st_teff_y"] / 5772) ** 4
-)
+    * (estrellas_grafico["st_teff_y"] / 5772) ** 4)
 
 estrellas_grafico["tipo_espectral"] = (
     estrellas_grafico["st_spectype"]
-    .str.extract(r"^([OBAFGKM])", expand=False)
-)
+    .str.extract(r"^([OBAFGKM])", expand=False))
 
 nombres_tipos_espectrales = {
     "O": "Tipo O - azul",
@@ -156,16 +151,12 @@ nombres_tipos_espectrales = {
     "F": "Tipo F - blanco-amarilla",
     "G": "Tipo G - amarilla",
     "K": "Tipo K - naranja",
-    "M": "Tipo M - roja"
-}
+    "M": "Tipo M - roja"}
 
 estrellas_grafico["tipo_espectral_nombre"] = (
-    estrellas_grafico["tipo_espectral"].map(nombres_tipos_espectrales)
-)
+    estrellas_grafico["tipo_espectral"].map(nombres_tipos_espectrales))
 
-estrellas_grafico = estrellas_grafico.dropna(
-    subset=["tipo_espectral"]
-)
+estrellas_grafico = estrellas_grafico.dropna(subset=["tipo_espectral"])
 
 plt.figure(figsize=(11, 7))
 
