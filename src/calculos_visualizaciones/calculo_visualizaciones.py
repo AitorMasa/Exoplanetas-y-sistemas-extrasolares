@@ -15,16 +15,19 @@ df = pd.read_csv(CSV_FILE)
 
 # 1. Cuantos planetas hay por sistema, frente a 8 en el Sistema Solar
 
-orden = sorted(df["sy_pnum"].unique())
+planetas = df.drop_duplicates(subset=["hostname", "pl_name"]).copy()
+sistemas = planetas.drop_duplicates(subset="hostname").copy()
+orden = sorted(sistemas["sy_pnum"].unique())
 
 plt.figure(figsize=(10, 7))
-sns.countplot(data=df,x="sy_pnum",order=orden,color="steelblue")
+sns.countplot(data=sistemas,x="sy_pnum",order=orden,color="steelblue")
 
 plt.title("1.Número de planetas conocidos por sistema")
 plt.xlabel("Número de planetas")
 plt.ylabel("Número de sistemas")
 plt.tight_layout()
-etiquetas(plt.gca(), df["sy_pnum"].notna().sum())
+etiquetas(plt.gca(), sistemas["sy_pnum"].notna().sum())
+plt.savefig(ROOT / "imagenes" /"1.planetas por sistema.png",dpi=300,bbox_inches="tight")
 plt.show()
 
 # 2. Sistemas con planetas pequenos en la zona interior 3. Ley de Kepler
@@ -47,7 +50,7 @@ plt.title("2.Sistemas con planetas pequeños interiores")
 plt.xlabel("")
 plt.ylabel("Número de sistemas")
 etiquetas(plt.gca(), pla_peq_int.sum())
-
+plt.savefig(ROOT / "imagenes" /"2. Sistemas con planetas pequenos en la zona interior.png",dpi=300,bbox_inches="tight")
 plt.show()
 
 # 3. Sistemas con y sin gigantes calientes
@@ -70,6 +73,7 @@ plt.title("3.Sistemas con gigantes calientes")
 plt.xlabel("")
 plt.ylabel("")
 etiquetas(plt.gca(), sistemas_gigantes_calientes.sum())
+plt.savefig(ROOT / "imagenes" /"3. Sistemas con gigantes calientes.png",dpi=300,bbox_inches="tight")
 plt.show()
 
 # 4. Sistemas con gigantes exteriores tipo Jupiter/Saturno
@@ -81,13 +85,14 @@ sistemas_gigantes_exteriores = (df.groupby("hostname")["gigante_exterior"].any()
 colores=["#E9C46A", "#B0B0B0"]
 
 plt.figure(figsize=(10, 7))
-sns.barplot( x=sistemas_gigantes_calientes.index ,y=sistemas_gigantes_calientes.values ,
-            hue=sistemas_gigantes_calientes.index,palette=colores)
+sns.barplot( x=sistemas_gigantes_exteriores.index ,y=sistemas_gigantes_exteriores.values ,
+            hue=sistemas_gigantes_exteriores.index,palette=colores)
 
 plt.title("4. Gigantes exteriores en los sistemas")
 plt.xlabel("")
 plt.ylabel("")
 etiquetas(plt.gca(), sistemas_gigantes_exteriores.sum())
+plt.savefig(ROOT / "imagenes" /"4. Sistemas con gigantes exteriores.png",dpi=300,bbox_inches="tight")
 plt.show()
 
 
@@ -120,12 +125,71 @@ plt.title("5. Sistemas con planetas en zona habitable estimada")
 plt.xlabel("")
 plt.ylabel("")
 etiquetas(plt.gca(), sistemas_zh.sum())
+plt.savefig(ROOT / "imagenes" /"5. Sistemas con al menos un planeta en zona habitable estimada.png",dpi=300,bbox_inches="tight")
 plt.show()
 
-# 6. Frecuencia de estrellas parecidas al Sol
+# 6. Temperatura y luminosidad según el tipo espectral
 
-df["similar_al_sol"] = (df["st_teff_y"].between(5500, 6050) &df["st_rad"].between(0.85, 1.15) &df["st_mass_y"].between(0.85, 1.15))
-conteo_solares = df["similar_al_sol"].map({True: "Similar al Sol", False: "No similar al Sol"}).value_counts()
+estrellas_grafico = sistemas.dropna(
+    subset=["st_teff_y", "st_rad"]
+).copy()
+
+estrellas_grafico = estrellas_grafico[
+    (estrellas_grafico["st_teff_y"] > 0)
+    & (estrellas_grafico["st_rad"] > 0)
+]
+
+estrellas_grafico["luminosidad_relativa"] = (
+    estrellas_grafico["st_rad"] ** 2
+    * (estrellas_grafico["st_teff_y"] / 5772) ** 4
+)
+
+estrellas_grafico["tipo_espectral"] = (
+    estrellas_grafico["st_spectype"]
+    .str.extract(r"^([OBAFGKM])", expand=False)
+)
+
+nombres_tipos_espectrales = {
+    "O": "Tipo O - azul",
+    "B": "Tipo B - azul-blanca",
+    "A": "Tipo A - blanca",
+    "F": "Tipo F - blanco-amarilla",
+    "G": "Tipo G - amarilla",
+    "K": "Tipo K - naranja",
+    "M": "Tipo M - roja"
+}
+
+estrellas_grafico["tipo_espectral_nombre"] = (
+    estrellas_grafico["tipo_espectral"].map(nombres_tipos_espectrales)
+)
+
+estrellas_grafico = estrellas_grafico.dropna(
+    subset=["tipo_espectral"]
+)
+
+plt.figure(figsize=(11, 7))
+
+sns.scatterplot(data=estrellas_grafico,x="st_teff_y",y="luminosidad_relativa",hue="tipo_espectral_nombre",hue_order=list(nombres_tipos_espectrales.values()),alpha=0.65,s=35)
+
+plt.yscale("log")
+plt.axhline(y=10 ** 0,color="black",linestyle="--",linewidth=1.2,alpha=0.7,label="Luminosidad del Sol (10⁰)")
+plt.axvline(x=5772,color="orange",linestyle="--",linewidth=1.2,alpha=0.8,label="Temperatura del Sol (5772 K)")
+
+plt.title("6.Temperatura y luminosidad de las estrellas")
+plt.xlabel("Temperatura efectiva (K)")
+plt.ylabel("Luminosidad relativa al Sol")
+plt.legend(title="Tipo espectral")
+plt.savefig(ROOT / "imagenes" /"6. Temperatura y luminosidad según el tipo espectral.png",dpi=300,bbox_inches="tight")
+
+plt.tight_layout()
+plt.show()
+
+
+
+# 7. Frecuencia de estrellas parecidas al Sol
+
+sistemas["similar_al_sol"] = (sistemas["st_teff_y"].between(5500, 6050) &sistemas["st_rad"].between(0.85, 1.15) &sistemas["st_mass_y"].between(0.85, 1.15))
+conteo_solares = sistemas["similar_al_sol"].map({True: "Similar al Sol", False: "No similar al Sol"}).value_counts()
 
 colores=["#F6D55C", "#B0B0B0"]
 
@@ -133,12 +197,14 @@ plt.figure(figsize=(10, 7))
 sns.barplot( x=conteo_solares.index ,y=conteo_solares.values ,
             hue=conteo_solares.index,palette=colores)
 
-plt.title("6. Estrellas similares al Sol",)
+plt.title("7. Estrellas similares al Sol",)
 plt.xlabel("")
 etiquetas(plt.gca(), conteo_solares.sum())
+plt.savefig(ROOT / "imagenes" /"7. Frecuencia de estrellas parecidas al Sol.png",dpi=300,bbox_inches="tight")
+
 plt.show()
 
-# 7. Analogos terrestres alrededor de estrellas similares al Sol
+# 8. Analogos terrestres alrededor de estrellas similares al Sol
 # Criterio: estrella similar al Sol, planeta 0.8 - 1.25 R_tierra y en HZ.
 df["estrella_similar_al_sol"] = (
     df["st_teff_y"].between(5500, 6050) &
@@ -162,13 +228,14 @@ plt.figure(figsize=(10, 7))
 sns.barplot( x=conteo_analogos.index ,y=conteo_analogos.values ,
             hue=conteo_analogos.index,palette=colores)
 
-plt.title("7. Analogos terrestres en estrellas similares al Sol")
+plt.title("8. Analogos terrestres en estrellas similares al Sol")
 plt.xlabel("")
 plt.ylabel("")
 etiquetas(plt.gca(), conteo_analogos.sum())
+plt.savefig(ROOT / "imagenes" /"8. Analogos terrestres alrededor de estrellas similares al Sol.png",dpi=300,bbox_inches="tight")
 plt.show()
 
-# 8. Arquitectura: pequenos interiores y gigantes exteriores
+# 9. Arquitectura: pequenos interiores y gigantes exteriores
 arquitectura = df.groupby("hostname").agg(
     pequenos_interiores=("pequeno_interior", "any"),
     gigantes_exteriores=("gigante_exterior", "any")
@@ -190,13 +257,15 @@ plt.figure(figsize=(10, 5))
 sns.barplot( x=conteo_arquitectura.index ,y=conteo_arquitectura.values ,
             hue=conteo_arquitectura.index,palette=colores)
 
-plt.title("8. Arquitectura planetaria por sistema")
+plt.title("9. Arquitectura planetaria por sistema")
 plt.xlabel("Número de sistemas")
 plt.ylabel("")
 etiquetas(plt.gca(), conteo_arquitectura.sum())
+plt.savefig(ROOT / "imagenes" /"9. Arquitectura planetaria por sistema.png",dpi=300,bbox_inches="tight")
+
 plt.show()
 
-# 9. Excentricidad de las orbitas
+# 10. Excentricidad de las orbitas
 
 excentricidades = df["pl_orbeccen_y"].dropna()
 excentricidades = excentricidades[(excentricidades >= 0) & (excentricidades < 1)]
@@ -212,14 +281,16 @@ plt.figure(figsize=(10, 7))
 sns.barplot(x=conteo_excentricidad .index , y=conteo_excentricidad.values,
             hue=conteo_excentricidad .index,palette=colores)
 
-plt.title("9. Excentricidad de las orbitas de exoplanetas")
+plt.title("10. Excentricidad de las orbitas de exoplanetas")
 plt.xlabel("Rango de excentricidad orbital")
 plt.ylabel("")
 etiquetas(plt.gca(), conteo_excentricidad.sum())
+plt.savefig(ROOT / "imagenes" /"10. Excentricidad de las orbitas de exoplanetas.png",dpi=300,bbox_inches="tight")
+
 plt.show()
 
 
-# 10. Extension orbital: a_max / a_min en sistemas con 2 o mas planetas
+# 11. Extension orbital: a_max / a_min en sistemas con 2 o mas planetas
 distancias = df.dropna(subset=["a_ua"]).groupby("hostname")["a_ua"].agg(
     planetas_con_distancia="count",
     a_min="min",
@@ -240,15 +311,49 @@ plt.figure(figsize=(10, 7))
 sns.barplot(x=conteo_extension.index , y=conteo_extension.values,
             hue=conteo_extension.index,palette=colores)
 
-plt.title("10. Extension orbital de sistemas multiplaneta")
+plt.title("11. Extension orbital de sistemas multiplaneta")
 plt.xlabel("Relacion entre la orbita mas externa e interna")
 plt.ylabel("Numero de planetas")
 etiquetas(plt.gca(), conteo_extension.sum())
+plt.savefig(ROOT / "imagenes" /"11. Extension orbital en sistemas con 2 o mas planetas.png",dpi=300,bbox_inches="tight")
+
 plt.show()
 
+# 12.Gráfico de dispersión: tamaño y periodo orbital de los planetas
 
+planetas_grafico = (df.drop_duplicates(subset=["hostname", "pl_name"]).dropna(subset=["pl_orbper_y", "pl_rade_y"]).copy())
+planetas_grafico = planetas_grafico[(planetas_grafico["pl_orbper_y"] > 0)& (planetas_grafico["pl_rade_y"] > 0)]
+planetas_grafico["clasificacion"] = (planetas_grafico["gigante_caliente"].map({True: "Gigante caliente",False: "Otros planetas"}))
 
+plt.figure(figsize=(11, 7))
 
+sns.scatterplot(data=planetas_grafico,x="pl_orbper_y",y="pl_rade_y",hue="clasificacion",hue_order=["Otros planetas", "Gigante caliente"],palette={
+        "Otros planetas": "#4C78A8",
+        "Gigante caliente": "#E76F51"},alpha=0.55,s=30)
+
+plt.xscale("log")
+plt.yscale("log")
+
+plt.axvline(x=10,color="gray",linestyle="--",linewidth=1.2,label="Límite de periodo (10 días)")
+
+plt.axhline(y=8,color="black",linestyle="--",linewidth=1.2,label="Límite de gigante (8 radios terrestres)")
+
+# Posición de la Tierra: 365.25 días y 1 radio terrestre
+
+plt.axvline(x=365.25,color="green",linestyle=":",linewidth=1.5,label="Periodo de la Tierra (365,25 días)")
+
+plt.axhline(y=1,color="green",linestyle=":",linewidth=1.5,label="Radio de la Tierra (1 R⊕)")
+
+plt.scatter(365.25,1,color="limegreen",edgecolor="black",s=130,marker="*",zorder=10,label="Tierra")
+
+plt.title("12.Tamaño de los exoplanetas y periodo orbital")
+plt.xlabel("Periodo orbital (días, escala logarítmica)")
+plt.ylabel("Radio del planeta (radios terrestres, escala logarítmica)")
+plt.legend(title="Clasificación")
+plt.tight_layout()
+plt.savefig(ROOT / "imagenes" / "12.Gráfico de dispersión, tamaño y periodo orbital de los planetas.png",dpi=300,bbox_inches="tight")
+
+plt.show()
 
 
 
