@@ -95,25 +95,3 @@ sy_dist          Distancia al sistema [parsecs].
  39  ra               6464 non-null   float64
  40  dec              6464 non-null   float64
  41  sy_dist          6329 non-null   float64
-
-
- INSPECCIONAR:
-
- pl_rade_x        4838 non-null   float64
- 7   pl_orbeccen_x    2788 non-null   float64
- 8   pl_eqt_x         1786 non-null   float64
- 9   st_teff_x        5686 non-null   float64
- 10  st_mass_x        5583 non-null   float64
- 15  pl_rade_y        4838 non-null   float64
- 16  pl_radj          4838 non-null   float64
- 17  pl_bmasse        3203 non-null   float64
- 18  pl_orbeccen_y    2788 non-null   float64
- 19  pl_insol         958 non-null    float64
- 20  pl_eqt_y         1786 non-null   float64
- 30  st_spectype      1434 non-null   object 
- 31  st_teff_y        5686 non-null   float64
- 32  st_rad           5630 non-null   float64
- 33  st_mass_y        5558 non-null   float64
- 34  st_met           4421 non-null   float64
- 35  st_metratio      4410 non-null   object 
- 36  st_logg          5323 non-null   float64
