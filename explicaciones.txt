@@ -1,33 +1,12 @@
-La letra indica principalmente temperatura y color: O, B, A, F, G, K, M, de más caliente a más fría. El número afina el tipo, y el número romano indica luminosidad: V es una estrella normal de secuencia principal, III una gigante y I una supergigante.
+La letra indica principalmente temperatura y color: O, B, A, F, G, K, M, de más caliente a más fría. 
+El número afina el tipo, y el número romano indica luminosidad: V es una estrella normal de secuencia principal, III una gigante y I una supergigante.
 
 Las enanas marrones suelen aparecer con tipos espectrales tardíos M, L, T o Y, pero ser enana marrón se determina realmente por su masa, no solo por st_spectype.
 
 
-ara comparar: la Tierra tiene excentricidad aproximada 0.017, Júpiter 0.049 y la mayoría de planetas del Sistema Solar tiene e < 0.1. Por tanto, las dos primeras barras representan órbitas bastante parecidas a las del Sistema Solar.
-
-    
-6:29 PM
-
-
-
-
-
-
+ara comparar: la Tierra tiene excentricidad aproximada 0.017, Júpiter 0.049 y la mayoría de planetas del Sistema Solar tiene e < 0.1. 
 
 las orbiotas de nuestro sistema por que rango quedan?
-
-
-
-
-
-
-
-6:30 PM
-
-
-
-
-
 
 Casi todos los planetas del Sistema Solar quedan en las dos primeras categorías:
 - Casi circular (0 - 0.05): Tierra (0.017), Venus (0.007), Neptuno (0.009), Júpiter (0.049).
