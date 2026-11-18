@@ -13,7 +13,7 @@ CSV_FILE = CLEAN / "dataset_merged.csv"
 
 df = pd.read_csv(CSV_FILE)
 
-# 0. Resumen general del dataset
+# Resumen general del dataset
 
 planetas = df.drop_duplicates(subset=["hostname", "pl_name"]).copy()
 sistemas = planetas.drop_duplicates(subset="hostname").copy()
@@ -41,22 +41,61 @@ for posicion, valor in enumerate(resumen_general.values):
     )
 
 plt.ylim(0, resumen_general.max() * 1.12)
-plt.title("0. Resumen general de los sistemas exoplanetarios")
+plt.title("Resumen general ")
 plt.xlabel("")
 plt.ylabel("Número total")
 plt.tight_layout()
 
-plt.savefig(ROOT / "imagenes" / "0. Resumen general del dataset.png",dpi=300,bbox_inches="tight")
+plt.savefig(ROOT / "imagenes" / "Resumen general del dataset.png",dpi=300,bbox_inches="tight")
 plt.show()
 
+# 0.Número de estrellas por sistema
+
+conteo_estrellas_sistema = (
+    pd.to_numeric(sistemas["sy_snum"], errors="coerce")
+    .dropna()
+    .astype(int)
+    .value_counts()
+    .sort_index()
+)
+
+plt.figure(figsize=(9, 6))
+colores=["#E76F51", "#4C78A8", "#E9C46A", "#E76F51"]
+sns.barplot(
+    x=conteo_estrellas_sistema.index,
+    y=conteo_estrellas_sistema.values,
+    hue=conteo_estrellas_sistema.index,
+    palette=colores,
+    legend=False
+)
+
+plt.title("0.Número de estrellas por sistema")
+plt.xlabel("Número de estrellas")
+plt.ylabel("Número de sistemas")
+
+etiquetas(
+    plt.gca(),
+    conteo_estrellas_sistema.sum()
+)
+
+plt.tight_layout()
+
+plt.savefig(
+    ROOT / "imagenes" / "0.Numero de estrellas por sistema.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.show()
 # 1. Cuantos planetas hay por sistema, frente a 8 en el Sistema Solar
 
 planetas = df.drop_duplicates(subset=["hostname", "pl_name"]).copy()
 sistemas = planetas.drop_duplicates(subset="hostname").copy()
 orden = sorted(sistemas["sy_pnum"].unique())
+colores=["#2A9D8F", "#8AB17D", "#E9C46A", "#F4A261", "#E76F51","#2A9D8F","#2A9D8F","#2A9D8F"]
 
 plt.figure(figsize=(10, 7))
-sns.countplot(data=sistemas,x="sy_pnum",order=orden,color="steelblue")
+sns.countplot(data=sistemas,x="sy_pnum",order=orden,palette=colores)
 
 plt.title("1.Número de planetas conocidos por sistema")
 plt.xlabel("Número de planetas")
@@ -245,9 +284,20 @@ df["analogo_tierra"] = (
 )
 sistemas_solares = df[df["estrella_similar_al_sol"]].groupby("hostname")
 analogos_por_sistema = sistemas_solares["analogo_tierra"].any()
-conteo_analogos = analogos_por_sistema.map(
-    {True: "Con analogo terrestre", False: "Sin analogo terrestre detectado"}
-).value_counts()
+conteo_analogos = (
+    analogos_por_sistema
+    .map({
+        True: "Con análogo terrestre",
+        False: "Sin análogo terrestre detectado"
+    })
+    .value_counts()
+    .reindex([
+        "Sin análogo terrestre detectado",
+        "Con análogo terrestre"
+    ], fill_value=0)
+)
+
+colores = ["#B0B0B0", "#2A9D8F"]
 
 colores=["#2A9D8F", "#B0B0B0"]
 
