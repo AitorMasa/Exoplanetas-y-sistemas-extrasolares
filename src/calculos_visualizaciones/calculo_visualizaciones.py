@@ -13,6 +13,42 @@ CSV_FILE = CLEAN / "dataset_merged.csv"
 
 df = pd.read_csv(CSV_FILE)
 
+# 0. Resumen general del dataset
+
+planetas = df.drop_duplicates(subset=["hostname", "pl_name"]).copy()
+sistemas = planetas.drop_duplicates(subset="hostname").copy()
+numero_sistemas = sistemas["hostname"].nunique()
+numero_estrellas = int(pd.to_numeric(sistemas["sy_snum"],errors="coerce").sum())
+numero_planetas = len(planetas)
+
+resumen_general = pd.Series({"Sistemas estelares": numero_sistemas,"Estrellas": numero_estrellas,
+    "Planetas": numero_planetas})
+
+colores = ["#4C78A8", "#F6D55C", "#2A9D8F"]
+
+plt.figure(figsize=(9, 6))
+
+ax = sns.barplot(x=resumen_general.index,y=resumen_general.values,hue=resumen_general.index,palette=colores,legend=False)
+
+for posicion, valor in enumerate(resumen_general.values):
+    plt.text(
+        posicion,
+        valor + 80,
+        f"{valor:,}".replace(",", "."),
+        ha="center",
+        fontsize=12,
+        fontweight="bold"
+    )
+
+plt.ylim(0, resumen_general.max() * 1.12)
+plt.title("0. Resumen general de los sistemas exoplanetarios")
+plt.xlabel("")
+plt.ylabel("Número total")
+plt.tight_layout()
+
+plt.savefig(ROOT / "imagenes" / "0. Resumen general del dataset.png",dpi=300,bbox_inches="tight")
+plt.show()
+
 # 1. Cuantos planetas hay por sistema, frente a 8 en el Sistema Solar
 
 planetas = df.drop_duplicates(subset=["hostname", "pl_name"]).copy()
@@ -340,6 +376,17 @@ plt.scatter(365.25,1,color="limegreen",edgecolor="black",s=130,marker="*",zorder
 plt.title("12.Tamaño de los exoplanetas y periodo orbital")
 plt.xlabel("Periodo orbital (días, escala logarítmica)")
 plt.ylabel("Radio del planeta (radios terrestres, escala logarítmica)")
+
+kepler_452b = df.loc[df["pl_name"] == "Kepler-452 b"].iloc[0]
+
+plt.scatter(kepler_452b["pl_orbper_y"],kepler_452b["pl_rade_y"],color="purple",edgecolor="black",
+    s=130,marker="*",zorder=10,label="Kepler-452 b")
+
+kepler_62f = df.loc[df["pl_name"] == "Kepler-62 f"].iloc[0]
+
+plt.scatter(kepler_62f["pl_orbper_y"],kepler_62f["pl_rade_y"],color="red",edgecolor="black",
+    s=130,marker="*",zorder=11,label="Kepler-62 f")
+
 plt.legend(title="Clasificación")
 plt.tight_layout()
 plt.savefig(ROOT / "imagenes" / "12.Gráfico de dispersión, tamaño y periodo orbital de los planetas.png",dpi=300,bbox_inches="tight")
