@@ -7,7 +7,7 @@ from funciones import etiquetas
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CLEAN = ROOT / "clean"
+CLEAN = ROOT / "CLEAN"
 
 CSV_FILE = CLEAN / "dataset_merged.csv"
 
@@ -31,14 +31,7 @@ plt.figure(figsize=(9, 6))
 ax = sns.barplot(x=resumen_general.index,y=resumen_general.values,hue=resumen_general.index,palette=colores,legend=False)
 
 for posicion, valor in enumerate(resumen_general.values):
-    plt.text(
-        posicion,
-        valor + 80,
-        f"{valor:,}".replace(",", "."),
-        ha="center",
-        fontsize=12,
-        fontweight="bold"
-    )
+    plt.text(posicion,valor + 80,f"{valor:,}".replace(",", "."),ha="center",fontsize=12,fontweight="bold")
 
 plt.ylim(0, resumen_general.max() * 1.12)
 plt.title("Resumen general ")
@@ -52,41 +45,25 @@ plt.show()
 # 0.Número de estrellas por sistema
 
 conteo_estrellas_sistema = (
-    pd.to_numeric(sistemas["sy_snum"], errors="coerce")
-    .dropna()
-    .astype(int)
-    .value_counts()
-    .sort_index()
-)
+    pd.to_numeric(sistemas["sy_snum"], errors="coerce").dropna().astype(int).value_counts().sort_index())
 
 plt.figure(figsize=(9, 6))
 colores=["#E76F51", "#4C78A8", "#E9C46A", "#E76F51"]
-sns.barplot(
-    x=conteo_estrellas_sistema.index,
-    y=conteo_estrellas_sistema.values,
-    hue=conteo_estrellas_sistema.index,
-    palette=colores,
-    legend=False
-)
+sns.barplot(x=conteo_estrellas_sistema.index,y=conteo_estrellas_sistema.values,hue=conteo_estrellas_sistema.index,
+    palette=colores,legend=False)
 
 plt.title("0.Número de estrellas por sistema")
 plt.xlabel("Número de estrellas")
 plt.ylabel("Número de sistemas")
 
-etiquetas(
-    plt.gca(),
-    conteo_estrellas_sistema.sum()
-)
+etiquetas(plt.gca(),conteo_estrellas_sistema.sum())
 
 plt.tight_layout()
 
-plt.savefig(
-    ROOT / "imagenes" / "0.Numero de estrellas por sistema.png",
-    dpi=300,
-    bbox_inches="tight"
-)
+plt.savefig(ROOT / "imagenes" / "0.Numero de estrellas por sistema.png",dpi=300,bbox_inches="tight")
 
 plt.show()
+
 # 1. Cuantos planetas hay por sistema, frente a 8 en el Sistema Solar
 
 planetas = df.drop_duplicates(subset=["hostname", "pl_name"]).copy()
@@ -207,35 +184,40 @@ plt.show()
 
 estrellas_grafico = sistemas.dropna(subset=["st_teff_y", "st_rad"]).copy()
 
-estrellas_grafico = estrellas_grafico[
-    (estrellas_grafico["st_teff_y"] > 0)
-    & (estrellas_grafico["st_rad"] > 0)]
+estrellas_grafico = estrellas_grafico[(estrellas_grafico["st_teff_y"] > 0)& (estrellas_grafico["st_rad"] > 0)]
 
-estrellas_grafico["luminosidad_relativa"] = (
-    estrellas_grafico["st_rad"] ** 2
-    * (estrellas_grafico["st_teff_y"] / 5772) ** 4)
+estrellas_grafico["luminosidad_relativa"] = (estrellas_grafico["st_rad"] ** 2* (estrellas_grafico["st_teff_y"] / 5772) ** 4)
 
-estrellas_grafico["tipo_espectral"] = (
-    estrellas_grafico["st_spectype"]
-    .str.extract(r"^([OBAFGKM])", expand=False))
+estrellas_grafico["tipo_espectral"] = (estrellas_grafico["st_spectype"].str.extract(r"^([OBAFGKM])", expand=False))
 
-nombres_tipos_espectrales = {
+# Conteo de estrellas representadas por tipo espectral
+
+orden_tipos = ["O", "B", "A", "F", "G", "K", "M"]
+
+conteo_tipos = (
+    estrellas_grafico["tipo_espectral"].value_counts().reindex(orden_tipos, fill_value=0))
+
+nombres_base = {
     "O": "Tipo O - azul",
     "B": "Tipo B - azul-blanca",
     "A": "Tipo A - blanca",
     "F": "Tipo F - blanco-amarilla",
     "G": "Tipo G - amarilla",
     "K": "Tipo K - naranja",
-    "M": "Tipo M - roja"}
+    "M": "Tipo M - roja"
+}
 
-estrellas_grafico["tipo_espectral_nombre"] = (
-    estrellas_grafico["tipo_espectral"].map(nombres_tipos_espectrales))
+nombres_tipos_espectrales = {
+    tipo: f"{nombres_base[tipo]} (n={conteo_tipos[tipo]})"
+    for tipo in orden_tipos}
 
-estrellas_grafico = estrellas_grafico.dropna(subset=["tipo_espectral"])
+estrellas_grafico["tipo_espectral_nombre"] = (estrellas_grafico["tipo_espectral"].map(nombres_tipos_espectrales))
 
 plt.figure(figsize=(11, 7))
 
-sns.scatterplot(data=estrellas_grafico,x="st_teff_y",y="luminosidad_relativa",hue="tipo_espectral_nombre",hue_order=list(nombres_tipos_espectrales.values()),alpha=0.65,s=35)
+sns.scatterplot(data=estrellas_grafico,x="st_teff_y",y="luminosidad_relativa",hue="tipo_espectral_nombre",hue_order=list(nombres_tipos_espectrales.values()),
+    alpha=0.65,
+    s=35)
 
 plt.yscale("log")
 plt.axhline(y=10 ** 0,color="black",linestyle="--",linewidth=1.2,alpha=0.7,label="Luminosidad del Sol (10⁰)")
@@ -245,6 +227,7 @@ plt.title("6.Temperatura y luminosidad de las estrellas")
 plt.xlabel("Temperatura efectiva (K)")
 plt.ylabel("Luminosidad relativa al Sol")
 plt.legend(title="Tipo espectral")
+plt.tight_layout()
 plt.savefig(ROOT / "imagenes" /"6. Temperatura y luminosidad según el tipo espectral.png",dpi=300,bbox_inches="tight")
 
 plt.tight_layout()
@@ -299,8 +282,6 @@ conteo_analogos = (
 
 colores = ["#B0B0B0", "#2A9D8F"]
 
-colores=["#2A9D8F", "#B0B0B0"]
-
 plt.figure(figsize=(10, 7))
 sns.barplot( x=conteo_analogos.index ,y=conteo_analogos.values ,
             hue=conteo_analogos.index,palette=colores)
@@ -335,8 +316,8 @@ sns.barplot( x=conteo_arquitectura.index ,y=conteo_arquitectura.values ,
             hue=conteo_arquitectura.index,palette=colores)
 
 plt.title("9. Arquitectura planetaria por sistema")
-plt.xlabel("Número de sistemas")
-plt.ylabel("")
+plt.xlabel("")
+plt.ylabel("Numero de sistemas")
 etiquetas(plt.gca(), conteo_arquitectura.sum())
 plt.savefig(ROOT / "imagenes" /"9. Arquitectura planetaria por sistema.png",dpi=300,bbox_inches="tight")
 
@@ -390,7 +371,7 @@ sns.barplot(x=conteo_extension.index , y=conteo_extension.values,
 
 plt.title("11. Extension orbital de sistemas multiplaneta")
 plt.xlabel("Relacion entre la orbita mas externa e interna")
-plt.ylabel("Numero de planetas")
+plt.ylabel("Numero de sistemas")
 etiquetas(plt.gca(), conteo_extension.sum())
 plt.savefig(ROOT / "imagenes" /"11. Extension orbital en sistemas con 2 o mas planetas.png",dpi=300,bbox_inches="tight")
 
